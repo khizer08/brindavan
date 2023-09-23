@@ -10,7 +10,7 @@ App = {
 
     // web3 connects our client side application to the blockchain.
     // metamask gives us an instance of web3 that we will use to connect to the blockchain
-    // if this doesn't happen we will set a default web3 provider from our local blockchain instance 'localhost 7545'
+    
     init: function () {
         return App.initWeb3();
     },
@@ -63,8 +63,6 @@ App = {
     listenForEvents: function () {
         App.contracts.Election.deployed().then(function (instance) {
             // Restart Chrome if you are unable to receive this event
-            // This is a known issue with Metamask
-            // https://github.com/MetaMask/metamask-extension/issues/2393
             instance.votedEvent({}, {
                 fromBlock: 0,
                 toBlock: 'latest'
