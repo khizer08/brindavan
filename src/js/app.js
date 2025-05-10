@@ -6,32 +6,28 @@ App = {
     votedForID: 0,
     finishElection: 0,
     mins: 0,
-
-
-    // web3 connects our client side application to the blockchain.
-    // metamask gives us an instance of web3 that we will use to connect to the blockchain
-    
+   
     init: function () {
         return App.initWeb3();
     },
 
     initWeb3: async function () {
-        // Modern dapp browsers...
+
         if (window.ethereum) {
             App.web3Provider = window.ethereum;
             try {
-                // Request account access
+
                 await window.ethereum.enable();
             } catch (error) {
-                // User denied account access...
+
                 console.error("User denied account access")
             }
         }
-// Legacy dapp browsers...
+
         else if (window.web3) {
             App.web3Provider = window.web3.currentProvider;
         }
-// If no injected web3 instance is detected, fall back to Ganache
+
         else {
             App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
         }
@@ -41,14 +37,9 @@ App = {
     },
 
 
-
-    // we then initailze our contract
-    // this function loads up our contract to our front end application
     initContract: function () {
         $.getJSON("Election.json", function (election) {
-            // Instantiate a new truffle contract from the artifact
             App.contracts.Election = TruffleContract(election);
-            // Connect provider to interact with contract
             App.contracts.Election.setProvider(App.web3Provider);
 
             App.listenForEvents();
@@ -59,25 +50,18 @@ App = {
 
 
 
-    // Listen for events emitted from the contract
+
     listenForEvents: function () {
         App.contracts.Election.deployed().then(function (instance) {
-            // Restart Chrome if you are unable to receive this event
             instance.votedEvent({}, {
                 fromBlock: 0,
                 toBlock: 'latest'
             }).watch(function (error, event) {
                 console.log("event triggered", event)
-                // Reload when a new vote is recorded
-                // App.render();
             });
         });
     },
 
-
-
-
-    // render function which is what will layout all the content on the page
     render: function () {
         var electionInstance;
         var loader = $("#loader");
@@ -88,7 +72,7 @@ App = {
         content.hide();
 
 
-        // Load account data
+
         web3.eth.getCoinbase(function (err, account) {
             if (err === null) {
                 App.account = account;
@@ -100,7 +84,7 @@ App = {
 
         App.contracts.Election.deployed().then(function(instance) {
             electionInstance = instance;
-            // document.querySelector('.buy-tickets').style.display = 'none';
+
 
             return electionInstance.manager();
         }).then(function (manager) {
@@ -177,14 +161,10 @@ App = {
             } else if (localStorage.getItem("finishElection") === "0") {
 
             }
-
         }).catch(function(error) {
           console.warn(error);
         });
     },
-
-
-
     castVote:  function () {
         var candidateId = $('#candidatesSelect').val();
         App.votedForID = candidateId;
@@ -202,8 +182,6 @@ App = {
             console.error(err);
         });
     },
-
-
     addUser: async function () {
         var firstName = $('#firstName').val();
         var lastName = $('#lastName').val();
@@ -218,25 +196,19 @@ App = {
         location.href='vote.html';
 
     },
-
-
     addCandidate: async function (){
         var CfirstName = $('#CfirstName').val();
         var ClastName = $('#ClastName').val();
         var CidNumber = $('#CidNumber').val();
-
         var app = await App.contracts.Election.deployed();
         await app.addCandidate(CfirstName, ClastName, CidNumber);
         $("#content").hide();
         $("#loader").show();
-
         location.href='admin.html';
     },
-
     login: async function() {
         var lidNumber = $('#lidNumber').val();
         var lpassword = $('#lpassword').val();
-
         var app = await App.contracts.Election.deployed();
         var users = await app.users();
         var usersCount = await app.usersCount;
@@ -262,19 +234,15 @@ App = {
         }
 
     },
-
     startElection: function () {
         localStorage.setItem("finishElection", "0");
         location.href='index.html';
     },
-
     endElection: function () {
         localStorage.setItem("finishElection", "1");
         location.href='results.html';
     }
-
 };
-
 $(function () {
     $(window).load(function () {
         App.init();
