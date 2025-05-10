@@ -11,7 +11,6 @@ contract ("Election", (accounts) => {
             assert.equal(count,3);
         });
     });
-
     it('initializes the candidates with the correct value', () => {
         return Election.deployed().then((instance) => {
             electionInstance = instance;
